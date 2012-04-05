@@ -46,7 +46,7 @@ def get_branch(repo, branches):
 
 def find_license_file(tree):
     for blob in tree['tree']:
-        if blob['path'].startswith("LICENSE"):
+        if 'LICENSE' in blob['path']:
             return blob
     raise KeyError("No LICENSE file found")
 
