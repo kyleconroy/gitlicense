@@ -17,7 +17,23 @@ LICENSES = [
     {
         'name': 'ISC License (ISC)',
         'text': open("licenses/isc.txt").read(),
-    }
+    },
+    {
+        'name': 'Apache License 2.0 (Apache-2.0)',
+        'text': open("licenses/apache-2.0.txt").read(),
+    },
+    {
+        'name': 'GNU General Public License, version 3 (GPL-3.0)',
+        'text': open("licenses/gpl-3.0.txt").read(),
+    },
+    {
+        'name': 'GNU AFFERO GENERAL PUBLIC LICENSE, Version 3 (AGPL-3.0)',
+        'text': open("licenses/agpl-3.0.txt").read(),
+    },
+    {
+        'name': 'BSD License',
+        'text': open("licenses/bsd.txt").read(),
+    },
 ]
     
 
