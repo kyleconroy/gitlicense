@@ -37,7 +37,7 @@ LICENSES = [
 ]
 
 def is_license(path):
-    return "license" in path.lower()
+    return "copying" in path.lower() or "license" in path.lower()
     
 
 def get_branch(repo, branches):
