@@ -14,3 +14,9 @@ The current algorithm is really simple. I look for a `LICENSE` or `LICENSE.*` fi
 * GNU General Public License, version 3 (GPL-3.0)
 * GNU AFFERO GENERAL PUBLIC LICENSE, Version 3 (AGPL-3.0)
 * BSD License
+
+## TODO
+
+* Improve the license matching algorithm
+* Support more licenses
+
