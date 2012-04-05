@@ -35,6 +35,9 @@ LICENSES = [
         'text': open("licenses/bsd.txt").read(),
     },
 ]
+
+def is_license(path):
+    return "license" in path.lower()
     
 
 def get_branch(repo, branches):
@@ -46,7 +49,7 @@ def get_branch(repo, branches):
 
 def find_license_file(tree):
     for blob in tree['tree']:
-        if 'LICENSE' in blob['path']:
+        if is_license(blob['path']):
             return blob
     raise KeyError("No LICENSE file found")
 
