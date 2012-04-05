@@ -53,9 +53,7 @@ def find_license_file(tree):
 
 def license_type(blob):
     blob = re.sub(r"\s", "", blob)
-    print blob
     for license in LICENSES:
-        print re.sub(r"\s", "", license['text'])
         if re.sub(r"\s", "", license['text']) in blob:
             return license['name']
     return "Unknown License"
