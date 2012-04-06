@@ -9,30 +9,56 @@ branch_url = "https://api.github.com/repos/{}/{}/branches"
 tree_url = "https://api.github.com/repos/{}/{}/git/trees/{}"
 blob_url = "https://api.github.com/repos/{}/{}/git/blobs/{}"
 
+
+def clean(blob):
+    return re.sub(r"\s|\*|\"|[0-9]\.|'", "", blob).lower()
+
+
 LICENSES = [
     {
-        'name': 'MIT license (MIT)',
-        'text': open("licenses/mit.txt").read(),
+        'name': 'MIT License',
+        'shorthand': 'MIT',
+        'text': clean(open("licenses/mitlite.txt").read()),
     },
     {
-        'name': 'ISC License (ISC)',
-        'text': open("licenses/isc.txt").read(),
+        'name': 'MIT License',
+        'shorthand': 'MIT',
+        'text': clean(open("licenses/mit.txt").read()),
     },
     {
-        'name': 'Apache License 2.0 (Apache-2.0)',
-        'text': open("licenses/apache-2.0.txt").read(),
+        'name': 'ISC License',
+        'shorthand': 'ISC',
+        'text': clean(open("licenses/isc.txt").read()),
     },
     {
-        'name': 'GNU General Public License, version 3 (GPL-3.0)',
-        'text': open("licenses/gpl-3.0.txt").read(),
+        'name': 'Apache License 2.0',
+        'shorthand': 'Apache-2.0',
+        'text': clean(open("licenses/apache-2.0.txt").read()),
     },
     {
-        'name': 'GNU AFFERO GENERAL PUBLIC LICENSE, Version 3 (AGPL-3.0)',
-        'text': open("licenses/agpl-3.0.txt").read(),
+        'name': 'GNU General Public License Version 2',
+        'shorthand': 'GPL-2.0',
+        'text': clean(open("licenses/gpl-2.0.txt").read()),
+    },
+    {
+        'name': 'GNU General Public License Version 3',
+        'shorthand': 'GPL-3.0',
+        'text': clean(open("licenses/gpl-3.0.txt").read()),
+    },
+    {
+        'name': 'GNU Affero General Public License Version 3',
+        'shorthand': 'AGPL-3.0',
+        'text': clean(open("licenses/agpl-3.0.txt").read()),
     },
     {
         'name': 'BSD License',
-        'text': open("licenses/bsd.txt").read(),
+        'shorthand': 'BSD',
+        'text': clean(open("licenses/bsd.txt").read()),
+    },
+    {
+        'name': 'Modified BSD License',
+        'shorthand': 'Modified BSD',
+        'texts': clean(open("licenses/modbsd.txt").read()).split("<split>"),
     },
 ]
 
@@ -51,15 +77,33 @@ def find_license_file(tree):
     for blob in tree['tree']:
         if is_license(blob['path']):
             return blob
-    raise KeyError("No LICENSE file found")
+
+
+def find_file(tree, filename):
+    for blob in tree['tree']:
+        if filename in blob['path'].lower():
+            return blob
 
 
 def license_type(blob):
-    blob = re.sub(r"\s", "", blob)
+    blob = clean(blob.replace("GNU Library General Public License",
+                              "GNU Lesser General Public License"))
+    print blob
     for license in LICENSES:
-        if re.sub(r"\s", "", license['text']) in blob:
-            return license['name']
+        try:
+            if license['text'] in blob:
+                return license['name']
+        except:
+            if all(text in blob for text in license['texts']):
+                return license['name']
     return "Unknown License"
+
+
+def license_mention(blob):
+    blob = clean(blob)
+    for license in LICENSES:
+        if clean(license['name']) in blob:
+            return license['name']
 
 
 def get(*args, **kwargs):
@@ -79,10 +123,26 @@ def get_license(user, repo_name):
     tree = get(tree_url.format(user, repo_name, branch['commit']['sha']))
     license = find_license_file(tree)
 
-    resp = requests.get(license['url'],
-                        headers={'Accept': 'application/vnd.github.v3.raw'})
+    if license:
+        resp = requests.get(license['url'],
+                            headers={'Accept': 'application/vnd.github.v3.raw'})
+        return license_type(resp.text)
 
-    return license_type(resp.text)
+
+    for filename in ["readme", "package.yml"]:
+        blob = find_file(tree, filename)
+
+        if not blob:
+            continue
+
+        resp = requests.get(blob['url'],
+                            headers={'Accept': 'application/vnd.github.v3.raw'})
+        license = license_mention(resp.text)
+
+        if license:
+            return license
+
+    return "No License Found"
 
 
 app = Flask(__name__)
