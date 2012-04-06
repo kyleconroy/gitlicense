@@ -10,8 +10,11 @@ tree_url = "https://api.github.com/repos/{}/{}/git/trees/{}"
 blob_url = "https://api.github.com/repos/{}/{}/git/blobs/{}"
 
 
-def clean(blob):
-    return re.sub(r"\s|\*|\"|[0-9]\.|'", "", blob).lower()
+def clean(blob, remove_numbers=True):
+    if remove_numbers:
+        return re.sub(r"\s|\*|\"|[0-9]\.|'", "", blob).lower()
+    else:
+        return re.sub(r"\s|\*|\"|\.|'", "", blob).lower()
 
 
 LICENSES = [
@@ -41,6 +44,11 @@ LICENSES = [
         'text': clean(open("licenses/gpl-2.0.txt").read()),
     },
     {
+        'name': 'Modified BSD License',
+        'shorthand': 'Modified BSD',
+        'texts': clean(open("licenses/modbsd.txt").read()).split("<split>"),
+    },
+    {
         'name': 'GNU Affero General Public License Version 3',
         'shorthand': 'AGPL-3.0',
         'text': clean(open("licenses/agpl-3.0.txt").read()),
@@ -51,20 +59,27 @@ LICENSES = [
         'text': clean(open("licenses/gpl-3.0.txt").read()),
     },
     {
-        'name': 'BSD License',
+        'name': 'BSD-2 License',
         'shorthand': 'BSD License',
         'text': clean(open("licenses/bsd.txt").read()),
     },
     {
-        'name': 'Modified BSD License',
-        'shorthand': 'Modified BSD',
-        'texts': clean(open("licenses/modbsd.txt").read()).split("<split>"),
+        'name': 'Mozilla Public License',
+        'shorthand': 'MPL License',
+        'text': clean(open("licenses/mpl.txt").read()),
     },
+    {
+        'name': 'Artistic License Version 2.0',
+        'shorthand': 'Artistic-2.0',
+        'text': clean(open("licenses/art-2.0.txt").read()),
+        'url': 'http://www.opensource.org/licenses/Artistic-2.0',
+    }
 ]
 
 def is_license(path):
-    return "copying" in path.lower() or "license" in path.lower()
-    
+    return ("copying" in path.lower() or
+            "license" in path.lower() or
+            "readme" in path.lower())
 
 def get_branch(repo, branches):
     for branch in branches:
@@ -76,7 +91,7 @@ def get_branch(repo, branches):
 def find_license_file(tree):
     for blob in tree['tree']:
         if is_license(blob['path']):
-            return blob
+            yield blob
 
 def find_license_by_name(tree):
     for blob in tree['tree']:
@@ -105,9 +120,9 @@ def license_type(blob):
 
 
 def license_mention(blob):
-    blob = clean(blob)
+    blob = clean(blob, remove_numbers=False)
     for license in LICENSES:
-        if clean(license['name']) in blob:
+        if clean(license['name'], remove_numbers=False) in blob:
             return license['name']
 
 
@@ -126,14 +141,14 @@ def get_license(user, repo_name):
     branches = get(repo['url'] + "/branches")
     branch = get_branch(repo, branches)
     tree = get(tree_url.format(user, repo_name, branch['commit']['sha']))
-    license = find_license_file(tree)
 
-    if license:
+    for license in find_license_file(tree):
         resp = requests.get(license['url'],
                             headers={'Accept': 'application/vnd.github.v3.raw'})
-        return license_type(resp.text)
+        ltype = license_type(resp.text)
+        if ltype != 'Unknown License':
+            return ltype
 
-    
     specific_name = find_license_by_name(tree)
 
     if specific_name:
