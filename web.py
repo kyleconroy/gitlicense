@@ -17,17 +17,17 @@ def clean(blob):
 LICENSES = [
     {
         'name': 'MIT License',
-        'shorthand': 'MIT',
+        'shorthand': 'MIT License',
         'text': clean(open("licenses/mitlite.txt").read()),
     },
     {
         'name': 'MIT License',
-        'shorthand': 'MIT',
+        'shorthand': 'MIT License',
         'text': clean(open("licenses/mit.txt").read()),
     },
     {
         'name': 'ISC License',
-        'shorthand': 'ISC',
+        'shorthand': 'ISC License',
         'text': clean(open("licenses/isc.txt").read()),
     },
     {
@@ -41,18 +41,18 @@ LICENSES = [
         'text': clean(open("licenses/gpl-2.0.txt").read()),
     },
     {
-        'name': 'GNU General Public License Version 3',
-        'shorthand': 'GPL-3.0',
-        'text': clean(open("licenses/gpl-3.0.txt").read()),
-    },
-    {
         'name': 'GNU Affero General Public License Version 3',
         'shorthand': 'AGPL-3.0',
         'text': clean(open("licenses/agpl-3.0.txt").read()),
     },
     {
+        'name': 'GNU General Public License Version 3',
+        'shorthand': 'GPL-3.0',
+        'text': clean(open("licenses/gpl-3.0.txt").read()),
+    },
+    {
         'name': 'BSD License',
-        'shorthand': 'BSD',
+        'shorthand': 'BSD License',
         'text': clean(open("licenses/bsd.txt").read()),
     },
     {
@@ -78,6 +78,12 @@ def find_license_file(tree):
         if is_license(blob['path']):
             return blob
 
+def find_license_by_name(tree):
+    for blob in tree['tree']:
+        for license in LICENSES:
+            if license['shorthand'] in blob['path']:
+                return license['name']
+
 
 def find_file(tree, filename):
     for blob in tree['tree']:
@@ -88,7 +94,6 @@ def find_file(tree, filename):
 def license_type(blob):
     blob = clean(blob.replace("GNU Library General Public License",
                               "GNU Lesser General Public License"))
-    print blob
     for license in LICENSES:
         try:
             if license['text'] in blob:
@@ -128,6 +133,11 @@ def get_license(user, repo_name):
                             headers={'Accept': 'application/vnd.github.v3.raw'})
         return license_type(resp.text)
 
+    
+    specific_name = find_license_by_name(tree)
+
+    if specific_name:
+        return specific_name
 
     for filename in ["readme", "package.yml"]:
         blob = find_file(tree, filename)
