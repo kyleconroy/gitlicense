@@ -305,3 +305,8 @@ def test_ry_node():
     msg = web.get_license('ry', 'node')
     assert_equals('MIT License', msg)
 
+def test_mbostock_d3():
+    msg = web.get_license('mbostock', 'd3')
+    assert_equals('Modified BSD License', msg)
+
+
