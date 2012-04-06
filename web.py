@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, abort
+from flask import Flask, jsonify, abort, make_response
 import os
 import requests
 import json
@@ -171,6 +171,33 @@ def get_license(user, repo_name):
 
 
 app = Flask(__name__)
+
+@app.route("/")
+def index():
+    index = """
+<!DOCTYPE html>
+<html>
+    <body>
+    <pre>
+# GitLicense
+
+REST API for discovering the license for a github repository.
+
+## Usage
+
+    curl -i http://gitlicense.herokuapp.com/:user/:repo
+
+The return value will be a JSON object of the following form.
+
+    {
+        repo: ":user",
+        user: ":repo",
+        license: "MIT License"
+    }
+    </pre>
+    </body>
+</html>"""
+    return make_response(index)
 
 @app.route("/<user>/<repo>")
 def index_with_url(user, repo):
