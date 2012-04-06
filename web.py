@@ -185,7 +185,7 @@ REST API for discovering the license for a github repository.
 
 ## Usage
 
-    curl -i http://gitlicense.herokuapp.com/:user/:repo
+    curl -i http://gitlicense.herokuapp.com/{user}/{repo}
 
 The return value will be a JSON object of the following form.
 
