@@ -73,7 +73,12 @@ LICENSES = [
         'shorthand': 'Artistic-2.0',
         'text': clean(open("licenses/art-2.0.txt").read()),
         'url': 'http://www.opensource.org/licenses/Artistic-2.0',
-    }
+    },
+    {
+        'name': 'Python Software Foundation License Version 2',
+        'shorthand': 'PSFL-2',
+        'text': clean(open("licenses/psfl-2.txt").read()),
+    },
 ]
 
 def is_license(path):
