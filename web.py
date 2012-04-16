@@ -77,7 +77,7 @@ LICENSES = [
     {
         'name': 'Python Software Foundation License Version 2',
         'shorthand': 'PSFL-2',
-        'text': clean(open("licenses/psfl-2.txt").read()),
+        'texts': clean(open("licenses/psfl-2.txt").read()).split("<split>"),
     },
 ]
 

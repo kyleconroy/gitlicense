@@ -309,4 +309,10 @@ def test_mbostock_d3():
     msg = web.get_license('mbostock', 'd3')
     assert_equals('Modified BSD License', msg)
 
+def test_editorconfig_core():
+    msg = web.get_license('editorconfig', 'editorconfig-core-py')
+    assert_equals('Python Software Foundation License Version 2', msg)
 
+def test_python_python():
+    msg = web.get_license('python-git', 'python')
+    assert_equals('Python Software Foundation License Version 2', msg)
