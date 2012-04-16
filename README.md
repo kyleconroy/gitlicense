@@ -26,6 +26,7 @@ The return value will be a JSON object of the following form.
 * Modified BSD License
 * Artisitic License 2.0
 * Mozilla Public License
+* Python Software Foundation License Version 2
 
 ## TODO
 
